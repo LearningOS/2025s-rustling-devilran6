@@ -1,8 +1,7 @@
 /*
-	graph
-	This problem requires you to implement a basic graph functio
+    graph
+    This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -29,19 +28,28 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        let (from, to, weight) = edge;
+
+        // Add nodes if they don't exist
+        self.add_node(from);
+        self.add_node(to);
+
+        // Add edge from -> to
+        let from_edges = self.adjacency_table_mutable().get_mut(from).unwrap();
+        from_edges.push((to.to_string(), weight));
+
+        // Add edge to -> from (since it's undirected)
+        let to_edges = self.adjacency_table_mutable().get_mut(to).unwrap();
+        to_edges.push((from.to_string(), weight));
     }
-}
-pub trait Graph {
-    fn new() -> Self;
-    fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
-    fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
-        //TODO
-		true
-    }
-    fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        if !self.contains(node) {
+            self.adjacency_table_mutable()
+                .insert(node.to_string(), Vec::new());
+            true
+        } else {
+            false
+        }
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()
@@ -58,6 +66,16 @@ pub trait Graph {
         }
         edges
     }
+}
+pub trait Graph {
+    fn new() -> Self;
+    fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
+    fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
+    fn add_node(&mut self, node: &str) -> bool;
+    fn add_edge(&mut self, edge: (&str, &str, i32));
+    fn contains(&self, node: &str) -> bool;
+    fn nodes(&self) -> HashSet<&String>;
+    fn edges(&self) -> Vec<(&String, &String, i32)>;
 }
 #[cfg(test)]
 mod test_undirected_graph {
